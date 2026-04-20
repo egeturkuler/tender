@@ -71,19 +71,17 @@ def run():
                 # Wait for elements
                 page.wait_for_selector("dx-select-box#select-yil", state="visible")
                 
-                # DevExtreme inputs usually have a visible interactable text input.
-                year_input = page.locator("dx-select-box#select-yil input.dx-texteditor-input")
-                year_input.click()
-                page.keyboard.press("Control+A") # Clear existing text
-                page.keyboard.press("Backspace")
-                year_input.fill(tender['year'])
-                page.keyboard.press("Enter")
+                # Select Year from the DevExtreme dropdown
+                page.locator("dx-select-box#select-yil").click()
+                # Wait for the dropdown list to appear and click the matching year
+                page.locator(".dx-list-item").get_by_text(tender['year'], exact=True).first.click()
                 
-                number_input = page.locator("dx-number-box#select-no input.dx-texteditor-input")
-                number_input.click()
+                # Enter Number
+                # Clicking the box itself and typing is safer for DevExtreme inputs
+                page.locator("dx-number-box#select-no").click()
                 page.keyboard.press("Control+A") # Clear existing text
                 page.keyboard.press("Backspace")
-                number_input.fill(tender['number'])
+                page.keyboard.type(tender['number'], delay=50) # Type slowly to simulate user
                 page.keyboard.press("Enter")
                 
                 # Click Search
