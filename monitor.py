@@ -8,14 +8,31 @@ from playwright.sync_api import sync_playwright
 # Configuration
 TENDERS = [
     {"year": "2026", "number": "444788"},
-    {"year": "2026", "number": "444785"}
+    {"year": "2026", "number": "444785"},
+    {"year": "2026", "number": "598415"},
+    {"year": "2026", "number": "570958"},
+    {"year": "2026", "number": "549455"},
+    {"year": "2026", "number": "531982"},
+    {"year": "2026", "number": "353620"},
+    {"year": "2026", "number": "484044"},
+    {"year": "2026", "number": "437317"},
+    {"year": "2026", "number": "556654"},
+    {"year": "2026", "number": "283833"},
+    {"year": "2026", "number": "427559"},
+    {"year": "2026", "number": "190629"},
+    {"year": "2026", "number": "142560"},
+    {"year": "2026", "number": "91317"},
+    {"year": "2026", "number": "246282"},
+    {"year": "2026", "number": "60005"},
+    {"year": "2026", "number": "17363"},
+    {"year": "2026", "number": "57104"}
 ]
 STATE_FILE = "state.json"
 URL = "https://ekapv2.kik.gov.tr/sorgulamalar/itirazen-sikayet-basvurusu-sorgulama"
 
 EMAIL_SENDER = os.environ.get("EMAIL_SENDER")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
-EMAIL_RECEIVER = "ege.turkuler@gmail.com"
+EMAIL_RECEIVERS = ["ege.turkuler@gmail.com", "batuhangunes26@gmail.com"]
 
 def load_state():
     if os.path.exists(STATE_FILE):
@@ -37,7 +54,7 @@ def send_email(subject, body):
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_SENDER
-    msg['To'] = EMAIL_RECEIVER
+    msg['To'] = ", ".join(EMAIL_RECEIVERS)
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
@@ -47,7 +64,7 @@ def send_email(subject, body):
         server.starttls()
         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
         text = msg.as_string()
-        server.sendmail(EMAIL_SENDER, EMAIL_RECEIVER, text)
+        server.sendmail(EMAIL_SENDER, EMAIL_RECEIVERS, text)
         server.quit()
         print(f"Email sent: {subject}")
     except Exception as e:
@@ -56,6 +73,7 @@ def send_email(subject, body):
 def run():
     state = load_state()
     state_changed = False
+    new_complaints = []
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -110,10 +128,7 @@ def run():
                     last_seen = state.get(tender_id, {}).get('last_seen_complaint', "")
                     
                     if latest_complaint_text != last_seen:
-                        subject = f"EKAP Complaint Alert for Tender {tender_id}"
-                        body = f"New or updated complaint found for {tender_id}:\n\n{latest_complaint_text}\n\nCheck at: {URL}"
-                        send_email(subject, body)
-                        
+                        new_complaints.append(f"--- Tender {tender_id} ---\n{latest_complaint_text}")
                         state[tender_id] = {'last_seen_complaint': latest_complaint_text}
                         state_changed = True
                 else:
@@ -123,6 +138,11 @@ def run():
                 print(f"Error checking tender {tender_id}: {e}")
 
         browser.close()
+
+    if new_complaints:
+        subject = f"EKAP Alert: {len(new_complaints)} New/Updated Complaints"
+        body = f"Found updates for {len(new_complaints)} tender(s):\n\n" + "\n\n".join(new_complaints) + f"\n\nCheck at: {URL}"
+        send_email(subject, body)
 
     if state_changed:
         save_state(state)
