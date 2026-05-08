@@ -9,7 +9,10 @@
         "last_seen_complaint": "06.04.2026 17:21\tUmut Radyoloji Ve Radyoterapi Cihazlar\u0131 Anonim \u015eirketi\t"
     },
     "2026/60005": {
-        "last_seen_complaint": "09.03.2026 09:43\tEge \u00d6zel Onkoloji Merkezi Limited \u015eirketi\t"
+        "complaints": [
+            "09.03.2026 09:43\tEge \u00d6zel Onkoloji Merkezi Limited \u015eirketi\t",
+            "04.05.2026 15:21\tEge \u00d6zel Onkoloji Merkezi Limited \u015eirketi\t"
+        ]
     },
     "2026/17363": {
         "last_seen_complaint": "06.04.2026 12:01\tTirad Yaz\u0131l\u0131m Sa\u011fl\u0131k San. Ve Tic. A. \u015e.\t"
@@ -19,5 +22,13 @@
     },
     "2026/556654": {
         "last_seen_complaint": "24.04.2026 11:29\tElekta Medikal Sistemler Tic. A.\u015e.\t"
+    },
+    "2025/1148625": {
+        "complaints": [
+            "26.09.2025 13:09\tLoji Pharma Sa\u011fl\u0131k A.\u015e.\t",
+            "12.12.2025 11:10\tTirad Yaz\u0131l\u0131m Sa\u011fl\u0131k Sanayi Ve Ticaret Anonim \u015eirketi\t",
+            "12.12.2025 12:19\tMedko Makina \u0130thalat \u0130hracat Ticaret Ve Sanayi Anonim \u015eirketi\t",
+            "27.04.2026 13:49\tTirad Yaz\u0131l\u0131m Sa\u011fl\u0131k Sanayi Ve Ticaret Anonim \u015eirketi\t"
+        ]
     }
 }
