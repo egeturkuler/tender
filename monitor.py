@@ -25,7 +25,10 @@ TENDERS = [
     {"year": "2026", "number": "246282"},
     {"year": "2026", "number": "60005"},
     {"year": "2026", "number": "17363"},
-    {"year": "2026", "number": "57104"}
+    {"year": "2026", "number": "57104"},
+    {"year": "2026", "number": "565047"},
+    {"year": "2026", "number": "735258"},
+    {"year": "2025", "number": "1148625"}
 ]
 STATE_FILE = "state.json"
 URL = "https://ekapv2.kik.gov.tr/sorgulamalar/itirazen-sikayet-basvurusu-sorgulama"
@@ -122,14 +125,25 @@ def run():
                 
                 if rows:
                     print(f"Found {len(rows)} complaints for {tender_id}.")
-                    # To be robust, combine text of all rows or just the first row
-                    latest_complaint_text = rows[0].inner_text()
                     
-                    last_seen = state.get(tender_id, {}).get('last_seen_complaint', "")
+                    current_complaints = [row.inner_text() for row in rows]
+                    tender_state = state.get(tender_id, {})
                     
-                    if latest_complaint_text != last_seen:
-                        new_complaints.append(f"--- Tender {tender_id} ---\n{latest_complaint_text}")
-                        state[tender_id] = {'last_seen_complaint': latest_complaint_text}
+                    # Backward compatibility for old state format
+                    last_seen_complaints = tender_state.get('complaints', [])
+                    if 'last_seen_complaint' in tender_state and not last_seen_complaints:
+                        if tender_state['last_seen_complaint']:
+                            last_seen_complaints = [tender_state['last_seen_complaint']]
+                    
+                    new_found = []
+                    for complaint in current_complaints:
+                        if complaint not in last_seen_complaints:
+                            new_found.append(complaint)
+                    
+                    if new_found:
+                        new_text = "\n\n".join(new_found)
+                        new_complaints.append(f"--- Tender {tender_id} (Total Complaints: {len(current_complaints)} | New Updates: {len(new_found)}) ---\n{new_text}")
+                        state[tender_id] = {'complaints': current_complaints}
                         state_changed = True
                 else:
                     print(f"No complaint rows found for {tender_id}.")
